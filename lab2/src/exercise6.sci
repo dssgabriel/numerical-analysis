@@ -25,7 +25,7 @@ A = [1, 2, 3;
 // 7. Computing the transpose of a matrix.
 A_transpose = A';
 
-
+// Declaring square matrices
 A = [1, 2, 3;
      4, 5, 6;
      7, 8, 9];
