@@ -23,6 +23,7 @@ sizes = [2; 3; 4; 8; 12; 16; 24; 32];
 len = size(sizes)(1);
 nb_runs = 200;
 errs = zeros(len, nb_runs);
+elapsed = zeros(len, nb_runs);
 
 [file, mode] = mopen("data/mylu3b.dat", "wb");
 
@@ -30,12 +31,14 @@ for i = 1 : len
     for j = 1 : nb_runs
         A = rand(sizes(i), sizes(i)) + ones(sizes(i), sizes(i));
 
+        tic();
         [L, U] = mylu3b(A);
+        elapsed(i, j) = toc();
     
         errs(i, j) = norm(A - L * U);
     end
     
-    mfprintf(file, "%d\t%e\n", sizes(i), mean(errs, 'c')(i));
+    mfprintf(file, "%d\t%e\t%e\n", sizes(i), mean(errs, 'c')(i), mean(elapsed, 'c')(i));
 end
 
 mclose(file);
