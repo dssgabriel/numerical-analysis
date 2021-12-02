@@ -1,4 +1,4 @@
-exec ./usolve.sci;
+exec ./src/usolve.sci;
 
 function [x] = gausskij3b(A, b)
     n = size(A)(1);
@@ -22,6 +22,8 @@ n = size(sizes)(1);
 forward_errs = zeros(n, 1);
 backward_errs = zeros(n, 1);
 
+[file, mode] = mopen("data/gauss.dat", "wb");
+
 for i = 1 : n
     A = rand(sizes(i), sizes(i)) + ones(sizes(i), sizes(i));
     b = rand(sizes(i), 1) + ones(sizes(i), 1);
@@ -31,4 +33,8 @@ for i = 1 : n
     
     forward_errs(i) = norm(x2 - x1) / norm(x2);
     backward_errs(i) = norm(b - A * x1) / (norm(A) * norm(x1));
+    
+    mfprintf(file, "%d\t%e\t%e\n", sizes(i), forward_errs(i), backward_errs(i));
 end
+
+mclose(file);
