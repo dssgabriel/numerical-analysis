@@ -13,7 +13,7 @@
 
 #include "blaslapack_headers.h"
 
-void set_GB_operator_rowMajor_poisson1D(double *AB, int *lab, int *la);
+void set_GB_operator_rowMajor_poisson1D(double *AB, int *lab, int *la, int *kv);
 void set_GB_operator_colMajor_poisson1D(double *AB, int *lab, int *la, int *kv);
 void set_GB_operator_colMajor_poisson1D_Id(double *AB, int *lab,
                                            int *la, int *kv);
