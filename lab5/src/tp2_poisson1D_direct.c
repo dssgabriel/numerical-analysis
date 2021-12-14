@@ -7,13 +7,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "lib_poisson1D.h"
 
 int main(int argc, char **argv)
 {
     int NRHS = 1;
-    int nbpoints = 102;
+    int nbpoints = 1000002;
     int la = nbpoints - 2;
     double T0 = -5.0, T1 = 5.0;
 
@@ -40,20 +41,25 @@ int main(int argc, char **argv)
 
     int row = 0;
     int info = 0;
+    struct timespec before, after;
     if (row) { // LAPACK_ROW_MAJOR
-        set_GB_operator_rowMajor_poisson1D(AB, &lab, &la);
+        set_GB_operator_rowMajor_poisson1D(AB, &lab, &la, &kv);
         // write_GB_operator_rowMajor_poisson1D(AB, &lab, &la, "AB_row.dat");
+        clock_gettime(CLOCK_MONOTONIC_RAW, &before);
         info = LAPACKE_dgbsv(LAPACK_ROW_MAJOR, la, kl, ku,
                              NRHS, AB, la, ipiv, RHS, NRHS);
-
+        clock_gettime(CLOCK_MONOTONIC_RAW, &after);
     } else { // LAPACK_COL_MAJOR
         set_GB_operator_colMajor_poisson1D(AB, &lab, &la, &kv);
         // write_GB_operator_colMajor_poisson1D(AB, &lab, &la, "AB_col.dat");
+        clock_gettime(CLOCK_MONOTONIC_RAW, &before);
         info = LAPACKE_dgbsv(LAPACK_COL_MAJOR, la, kl, ku,
                              NRHS, AB, lab, ipiv, RHS, la);
-    }    
+        clock_gettime(CLOCK_MONOTONIC_RAW, &after);
+    }
   
     printf("INFO DGBSV = %d\n", info);
+    printf("TIME DGBSV = %lf\n", (after.tv_sec - before.tv_sec) + (after.tv_nsec - before.tv_nsec) / 1e9);
     write_xy(RHS, X, &la, "SOL.dat");
 
     // Relative residual

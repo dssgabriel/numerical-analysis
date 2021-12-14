@@ -10,9 +10,22 @@
 
 #include "lib_poisson1D.h"
 
-// TODO:
-void set_GB_operator_rowMajor_poisson1D(double *AB, int *lab, int *la)
+void set_GB_operator_rowMajor_poisson1D(double *AB, int *lab, int *la, int *kv)
 {
+    size_t kk = (*kv) * (*la);
+    if (*kv >= 0) {
+        for (size_t ii = 0; ii < kk; ii++)
+            AB[ii] = 0.0;
+    }
+
+    for (size_t ii = 0; ii < (*la); ii++) {
+        AB[kk + ii] = -1.0;
+        AB[kk + ii + (*la)] = 2.0;
+        AB[kk + ii + 2 * (*la)] = -1.0;
+    }
+
+    AB[kk] = 0.0;
+    AB[kk + 3 * (*la) - 1] = 0.0;
 }
 
 void set_GB_operator_colMajor_poisson1D(double *AB, int *lab, int *la, int *kv)
@@ -24,13 +37,13 @@ void set_GB_operator_colMajor_poisson1D(double *AB, int *lab, int *la, int *kv)
                 AB[kk + ii] = 0.0;
         }
         AB[kk + *kv] = -1.0;
-        AB[kk + *kv+1] = 2.0;
-        AB[kk + *kv+2] = -1.0;
+        AB[kk + *kv + 1] = 2.0;
+        AB[kk + *kv + 2] = -1.0;
     }
 
     AB[0] = 0.0;
     if (*kv == 1)
-        AB[1] = 0;
+        AB[1] = 0.0;
   
     AB[(*lab) * (*la) - 1] = 0.0;
 }
