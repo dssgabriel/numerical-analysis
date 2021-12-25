@@ -1,0 +1,9 @@
+set term pngcairo size 1080, 720
+set grid
+set ytics nomirror
+set y2tics
+set xlabel "Matrix size"
+set ylabel "Relative error"
+set y2label "Time (s)"
+set output "plots/ex1_ldlt.png"
+plot "data/ldlt.dat" u 1:2 w lp t "myldlt error" axes x1y1, "data/ldlt.dat" u 1:3 w lp t "myldlt time" axes x1y2
