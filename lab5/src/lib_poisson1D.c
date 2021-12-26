@@ -108,10 +108,22 @@ void write_GB_operator_rowMajor_poisson1D(double *AB, int *lab,
     }
 }
 
-// TODO:
 void write_GB_operator_colMajor_poisson1D(double *AB, int *lab,
                                           int *la, char *filename)
 {
+    FILE *file = fopen(filename, "wb");
+
+    // Numbering from 1 to la
+    if (file != NULL) {
+        for (size_t ii = 0; ii < (*la); ii++) {
+            for (size_t jj = 0; jj < (*lab); jj++)
+                fprintf(file, "%lf\t", AB[ii * (*lab) + jj]);
+            fprintf(file, "\n");
+        }
+        fclose(file);
+    } else {
+        perror(filename);
+    }
 }
 
 void write_vec(double *vec, int *la, char *filename)
