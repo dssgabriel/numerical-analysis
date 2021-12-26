@@ -25,14 +25,17 @@ INCL= -I $(TPDIR)/include $(INCLBLASLAPACK)
 OBJENV=deps/tp_env.o
 OBJTP2ITER=deps/lib_poisson1D.o deps/tp2_poisson1D_iter.o
 OBJTP2DIRECT=deps/lib_poisson1D.o deps/tp2_poisson1D_direct.o
+OBJTP2LU=deps/lib_poisson1D.o deps/lib_lu_tridiag.o deps/tp2_lu_tridiag.o
 
-all: bin/tp_testenv bin/tp2poisson1D_iter bin/tp2poisson1D_direct
+all: bin/tp_testenv bin/tp2poisson1D_iter bin/tp2poisson1D_direct bin/tp2_lu_tridiag
 
 testenv: bin/tp_testenv
 
 tp2poisson1D_iter: bin/tp2poisson1D_iter
 
 tp2poisson1D_direct: bin/tp2poisson1D_direct
+
+tp2_lu_tridiag: bin/tp2_lu_tridiag
 
 deps/tp_env.o: $(TPDIRSRC)/tp_env.c
 	@mkdir -p deps/
@@ -41,6 +44,10 @@ deps/tp_env.o: $(TPDIRSRC)/tp_env.c
 deps/lib_poisson1D.o: $(TPDIRSRC)/lib_poisson1D.c
 	@mkdir -p deps/
 	$(CC) $(OPTC) -c $(INCL) $(TPDIRSRC)/lib_poisson1D.c -o $@
+	
+deps/lib_lu_tridiag.o: $(TPDIRSRC)/lib_lu_tridiag.c
+	@mkdir -p deps/
+	$(CC) $(OPTC) -c $(INCL) $(TPDIRSRC)/lib_lu_tridiag.c -o $@
 
 deps/tp2_poisson1D_iter.o: $(TPDIRSRC)/tp2_poisson1D_iter.c
 	@mkdir -p deps/
@@ -50,7 +57,11 @@ deps/tp2_poisson1D_direct.o: $(TPDIRSRC)/tp2_poisson1D_direct.c
 	@mkdir -p deps/
 	$(CC) $(OPTC) -c $(INCL) $(TPDIRSRC)/tp2_poisson1D_direct.c -o $@
 
-bin/tp_testenv: $(OBJENV) 
+deps/tp2_lu_tridiag.o: $(TPDIRSRC)/tp2_lu_tridiag.c
+	@mkdir -p deps/
+	$(CC) $(OPTC) -c $(INCL) $(TPDIRSRC)/tp2_lu_tridiag.c -o $@
+
+bin/tp_testenv: $(OBJENV)
 	$(CC) -o bin/tp_testenv $(OPTC) $(OBJENV) $(LIBS)
 
 bin/tp2poisson1D_iter: $(OBJTP2ITER)
@@ -59,14 +70,20 @@ bin/tp2poisson1D_iter: $(OBJTP2ITER)
 bin/tp2poisson1D_direct: $(OBJTP2DIRECT)
 	$(CC) -o bin/tp2poisson1D_direct $(OPTC) $(OBJTP2DIRECT) $(LIBS)
 
+bin/tp2_lu_tridiag: $(OBJTP2LU)
+	$(CC) -o bin/tp2_lu_tridiag $(OPTC) $(OBJTP2LU) $(LIBS)
+
 run_testenv: bin/tp_testenv
-	$^
+	@$^
 
 run_tp2poisson1D_iter: bin/tp2poisson1D_iter
-	$^
+	@$^
 
 run_tp2poisson1D_direct: bin/tp2poisson1D_direct
-	$^
+	@$^
+
+run_tp2_lu_tridiag: bin/tp2_lu_tridiag
+	@$^
 
 clean:
-	rm -rf deps/ bin/* data/*
+	rm -rf deps/ bin/* data/* *.dat
