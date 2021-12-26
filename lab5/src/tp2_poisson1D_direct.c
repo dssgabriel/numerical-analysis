@@ -22,13 +22,19 @@ int main(int argc, char **argv)
     double *RHS = malloc(la * sizeof(double));
     double *EX_SOL = malloc(la * sizeof(double));
     double *X = malloc(la * sizeof(double));
+    // Vectors for cblas_dgbmv
     double *Y_dgbmv = malloc(la * sizeof(double));
+    double *RHS_dgbmv = malloc(la * sizeof(double));
 
     set_grid_points_1D(X, &la);
     set_dense_RHS_DBC_1D(RHS, &la, &T0, &T1);
+    // Exact solution used for cblas_dgbmv
+    set_dense_RHS_DBC_1D(RHS_dgbmv, &la, &T0, &T1);
     set_analytical_solution_DBC_1D(EX_SOL, X, &la, &T0, &T1);
 
     write_vec(RHS, &la, "data/RHS.dat");
+    // Output the exact solution used for cblas_dgbmv to a file
+    write_vec(RHS_dgbmv, &la, "data/RHS_dgbmv.dat");
     write_vec(EX_SOL, &la, "data/EX_SOL.dat");
     write_vec(X, &la, "data/X_grid.dat");
 
@@ -73,8 +79,8 @@ int main(int argc, char **argv)
         cblas_dgbmv(CblasColMajor,
                     CblasNoTrans, la, la,
                     kl, ku,
-                    2.0f, AB, lab,
-                    EX_SOL, 1, 0.0f,
+                    1.0f, AB, lab,   // alpha = 1.0f
+                    EX_SOL, 1, 0.0f, // beta = 0.0f
                     Y_dgbmv, 1);
         write_vec(Y_dgbmv, &la, "data/Y_dgbmv_col.dat");
     }
@@ -84,18 +90,38 @@ int main(int argc, char **argv)
     write_xy(RHS, X, &la, "data/SOL.dat");
 
     // Relative residual
-    double tmp = cblas_ddot(la, RHS, 1, RHS,1);
+    double tmp = cblas_ddot(la, RHS, 1, RHS, 1);
     tmp = sqrt(tmp);
     cblas_daxpy(la, -1.0, RHS, 1, EX_SOL, 1);
-    double relres = cblas_ddot(la, EX_SOL, 1, EX_SOL,1);
+    double relres = cblas_ddot(la, EX_SOL, 1, EX_SOL, 1);
     relres = sqrt(relres);
     relres = relres / tmp;
     printf("The relative residual error is relres = %e\n", relres);
 
+    /// Exercise 4: Relative error for cblas_dgbmv
+    printf("\nCBLAS_DGBMV:\n");
+
+    // Compute norm 2 of Y_dgbmv
+    tmp = cblas_ddot(la, Y_dgbmv, 1, Y_dgbmv, 1);
+    tmp = sqrt(tmp);
+
+    // Compute B - Y_dgbmv
+    cblas_daxpy(la, -1.0, Y_dgbmv, 1, RHS_dgbmv, 1);
+
+    // Compute norm 2 of B
+    relres = cblas_ddot(la, RHS_dgbmv, 1, RHS_dgbmv, 1);
+    relres = sqrt(relres);
+
+    // Compute relative error
+    relres /= tmp;
+    printf("Relative error for `cblas_dgbmv` = %e\n", relres);
+
     // Free arrays
     free(RHS);
+    free(RHS_dgbmv);
     free(EX_SOL);
     free(X);
+    free(Y_dgbmv);
     free(AB);
     free(ipiv);
     printf("\n-- End --\n");
