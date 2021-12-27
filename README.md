@@ -18,3 +18,13 @@ Le TP3 s'appuie sur les bases du TP précèdent afin d'implémenter des algorith
 Tous les graphiques ont été réalisés à partir des valeurs calculées par Scilab et écrites dans des fichiers de sortie au format `.dat` (accessibles 
 dans les dossiers `lab*/data/*.dat`).
 Ces données ont ensuite été traitées grâce à l'outil [Gnuplot](http://www.gnuplot.info/) (dont les scripts sont disponibles dans les dossiers `lab*/scripts/*.gp`).
+
+# Calcul Numérique - TP4 et 5
+
+- LDL^T
+- CSR
+- LAPACK dgbsv()
+- CBLAS dgbmv()
+- LU tridiagonal
+- Jacobi & Gauss-Seidel
+- Richardson
